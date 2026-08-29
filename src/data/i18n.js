@@ -143,6 +143,7 @@ const DICT = {
       errPassword: 'Неверный пароль',
     },
     side: { logout: 'Выйти', menu: 'Меню', language: 'Язык интерфейса' },
+    theme: {"theme":"Тема оформления","light":"Светлая","dark":"Тёмная","system":"Как в системе"},
     toast: {"welcome":"С возвращением, {name}!","paymentAccepted":"Оплата принята: {name} · {course}. Статус — «Активен» до {date}","frozen":"Обучение приостановлено: {course}","unfrozen":"Обучение возобновлено: {course}","deactivated":"Активность снята: {course}","studentAdded":"Ученик {name} добавлен. Активируйте его приёмом оплаты","enrolled":"Ученик записан в группу {group}","graded":"Оценка {score} сохранена — {name}","assignmentCreated":"Задание выдано группе {group}","lessonMarked":"Урок отмечен: {group} — {done} из {total}","homeworkSubmitted":"Работа отправлена на проверку","dbReset":"Демо-база возвращена к исходному состоянию","langChanged":"Язык интерфейса: {lang}"},
     ann: {"c1":{"title":"Открыт набор на Multilevel C1","text":"Стартуем 10 сентября. Свободных мест в группе: 12."},"ielts":{"title":"Пробный IELTS — в субботу","text":"Полный mock-тест для групп IELTS 6.5+. Начало в 10:00, каб. 4."},"payment":{"title":"Оплата за сентябрь","text":"Приём оплаты на ресепшн до 5 числа. Статус активируется сразу после оплаты."}},
     group: {
@@ -355,6 +356,7 @@ const DICT = {
       errPassword: 'Parol noto‘g‘ri',
     },
     side: { logout: 'Chiqish', menu: 'Menyu', language: 'Interfeys tili' },
+    theme: {"theme":"Mavzu","light":"Yorug‘","dark":"Qorong‘i","system":"Tizimdagidek"},
     toast: {"welcome":"Xush kelibsiz, {name}!","paymentAccepted":"To‘lov qabul qilindi: {name} · {course}. Status — «Faol», {date} gacha","frozen":"O‘qish to‘xtatildi: {course}","unfrozen":"O‘qish qayta boshlandi: {course}","deactivated":"Faollik olib tashlandi: {course}","studentAdded":"{name} qo‘shildi. To‘lovni qabul qilib faollashtiring","enrolled":"O‘quvchi {group} guruhiga yozildi","graded":"{score} bahosi saqlandi — {name}","assignmentCreated":"Vazifa {group} guruhiga berildi","lessonMarked":"Dars belgilandi: {group} — {total} dan {done} ta","homeworkSubmitted":"Ish tekshiruvga yuborildi","dbReset":"Demo baza dastlabki holatga qaytarildi","langChanged":"Interfeys tili: {lang}"},
     ann: {"c1":{"title":"Multilevel C1 guruhiga qabul ochiq","text":"10-sentabrda boshlaymiz. Guruhda 12 ta joy bor."},"ielts":{"title":"Sinov IELTS — shanba kuni","text":"IELTS 6.5+ guruhlari uchun to‘liq mock-test. Boshlanishi 10:00, 4-xona."},"payment":{"title":"Sentabr uchun to‘lov","text":"To‘lov resepshnda 5-sanagacha qabul qilinadi. Status to‘lovdan so‘ng darhol faollashadi."}},
     group: {
@@ -567,6 +569,7 @@ const DICT = {
       errPassword: 'Wrong password',
     },
     side: { logout: 'Log out', menu: 'Menu', language: 'Interface language' },
+    theme: {"theme":"Appearance","light":"Light","dark":"Dark","system":"System"},
     toast: {"welcome":"Welcome back, {name}!","paymentAccepted":"Payment accepted: {name} · {course}. Status “Active” until {date}","frozen":"Studies paused: {course}","unfrozen":"Studies resumed: {course}","deactivated":"Active status removed: {course}","studentAdded":"{name} added. Activate by accepting a payment","enrolled":"Student enrolled in {group}","graded":"Score {score} saved — {name}","assignmentCreated":"Assignment issued to {group}","lessonMarked":"Lesson marked: {group} — {done} of {total}","homeworkSubmitted":"Work sent for review","dbReset":"Demo database restored to its initial state","langChanged":"Interface language: {lang}"},
     ann: {"c1":{"title":"Multilevel C1 enrolment is open","text":"We start on 10 September. 12 seats left in the group."},"ielts":{"title":"Mock IELTS — this Saturday","text":"A full mock test for IELTS 6.5+ groups. Starts at 10:00, room 4."},"payment":{"title":"September payment","text":"Payments are accepted at the front desk until the 5th. Status activates right after payment."}},
     group: {

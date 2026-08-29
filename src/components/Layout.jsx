@@ -3,7 +3,8 @@ import logoUrl from '../assets/logo.png'
 import { CENTER } from '../data/seed.js'
 import { LANGS, t, useLang } from '../data/i18n.js'
 import { useStore } from '../data/store.js'
-import { IconChevron, IconLogout, IconMenu } from './icons.jsx'
+import { useTheme } from '../data/theme.js'
+import { IconChevron, IconDark, IconLight, IconLogout, IconMenu, IconSystem } from './icons.jsx'
 import { notify } from './toast.js'
 import { Avatar } from './ui.jsx'
 
@@ -30,7 +31,34 @@ export function LangSwitch({ className = '' }) {
   )
 }
 
-/** Меню пользователя в шапке: имя, роль, язык (на телефоне) и выход. */
+const THEME_OPTIONS = [
+  { id: 'light', Icon: IconLight },
+  { id: 'dark', Icon: IconDark },
+  { id: 'system', Icon: IconSystem },
+]
+
+/** Переключатель темы: светлая / тёмная / как в системе */
+export function ThemeSwitch({ className = '' }) {
+  const { theme, setTheme } = useTheme()
+  return (
+    <div className={'seg theme-switch ' + className}>
+      {THEME_OPTIONS.map(({ id, Icon }) => (
+        <button
+          key={id}
+          className={theme === id ? 'on' : ''}
+          title={t('theme.' + id)}
+          aria-label={t('theme.' + id)}
+          aria-pressed={theme === id}
+          onClick={() => setTheme(id)}
+        >
+          <Icon />
+        </button>
+      ))}
+    </div>
+  )
+}
+
+/** Меню пользователя в шапке: имя, роль, тема, язык (на телефоне) и выход. */
 function UserMenu() {
   const { currentUser, logout } = useStore()
   const [open, setOpen] = useState(false)
@@ -64,6 +92,11 @@ function UserMenu() {
               <b>{currentUser.name}</b>
               <span>{t('role.' + currentUser.role)}</span>
             </div>
+          </div>
+
+          <div className="user-pop-lang">
+            <span className="small muted">{t('theme.theme')}</span>
+            <ThemeSwitch />
           </div>
 
           <div className="user-pop-lang">
@@ -150,6 +183,7 @@ export function Layout({ nav, route, go, title, sub, actions, children }) {
           </div>
           <div className="topbar-right">
             <div className="topbar-actions">{actions}</div>
+            <ThemeSwitch className="topbar-lang" />
             <LangSwitch className="topbar-lang" />
             <UserMenu />
           </div>

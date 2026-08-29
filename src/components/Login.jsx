@@ -5,7 +5,7 @@ import { courseName, t } from '../data/i18n.js'
 import { useStore } from '../data/store.js'
 import { notify } from './toast.js'
 import { CourseIcon, IconAward, IconStudents, IconTeacher, IconWarning } from './icons.jsx'
-import { LangSwitch } from './Layout.jsx'
+import { LangSwitch, ThemeSwitch } from './Layout.jsx'
 import { Field } from './ui.jsx'
 
 export default function Login() {
@@ -74,12 +74,13 @@ export default function Login() {
 
       <div className="auth-form">
         <div className="auth-box stack">
-          <div className="row">
-            <div style={{ flex: 1 }}>
-              <h1 style={{ fontSize: 26 }}>{t('login.title')}</h1>
-              <p className="muted" style={{ marginTop: 6 }}>{t('login.subtitle')}</p>
-            </div>
+          <div className="row wrap" style={{ gap: 8, justifyContent: 'flex-end' }}>
+            <ThemeSwitch />
             <LangSwitch />
+          </div>
+          <div>
+            <h1 style={{ fontSize: 26 }}>{t('login.title')}</h1>
+            <p className="muted" style={{ marginTop: 6 }}>{t('login.subtitle')}</p>
           </div>
 
           <form onSubmit={submit} className="stack" style={{ gap: 13 }}>

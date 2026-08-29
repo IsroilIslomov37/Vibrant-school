@@ -3,6 +3,7 @@
    ───────────────────────────────────────────────────────────── */
 
 :root {
+  color-scheme: light;
   --bg: #f4f6fb;
   --surface: #ffffff;
   --surface-2: #f8fafc;
@@ -39,33 +40,66 @@
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
 }
 
+/* Тёмная палитра. Два блока: «как в системе» (без data-theme или при
+   явном dark) и принудительный выбор пользователя. Держать синхронно. */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0d0f1c;
-    --surface: #15182a;
-    --surface-2: #1b1f34;
-    --border: #262b44;
-    --border-strong: #333a58;
-    --text: #eef1f8;
-    --text-2: #99a1bd;
-    --text-3: #6f779a;
-    --brand: #d0a852;
-    --brand-600: #c09942;
-    --brand-soft: #3a2f16;
-    --gold: #d9b45e;
-    --ok-soft: #0d2b22;
-    --warn-soft: #2e2210;
-    --bad-soft: #2d1417;
-    --info-soft: #0c2436;
-    --muted-soft: #21263c;
-    --ok: #34d399;
-    --warn: #fbbf24;
-    --bad: #f87171;
-    --info: #38bdf8;
-    --sidebar: #1e2124;
-    --sidebar-2: #2a2e32;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  :root:not([data-theme='light']) {
+  color-scheme: dark;
+  --bg: #0d0f1c;
+  --surface: #15182a;
+  --surface-2: #1b1f34;
+  --border: #262b44;
+  --border-strong: #333a58;
+  --text: #eef1f8;
+  --text-2: #99a1bd;
+  --text-3: #6f779a;
+  --brand: #d0a852;
+  --brand-600: #c09942;
+  --brand-soft: #3a2f16;
+  --gold: #d9b45e;
+  --ok: #34d399;
+  --ok-soft: #0d2b22;
+  --warn: #fbbf24;
+  --warn-soft: #2e2210;
+  --bad: #f87171;
+  --bad-soft: #2d1417;
+  --info: #38bdf8;
+  --info-soft: #0c2436;
+  --muted-soft: #21263c;
+  --sidebar: #1e2124;
+  --sidebar-2: #2a2e32;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, 0.72);
   }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0d0f1c;
+  --surface: #15182a;
+  --surface-2: #1b1f34;
+  --border: #262b44;
+  --border-strong: #333a58;
+  --text: #eef1f8;
+  --text-2: #99a1bd;
+  --text-3: #6f779a;
+  --brand: #d0a852;
+  --brand-600: #c09942;
+  --brand-soft: #3a2f16;
+  --gold: #d9b45e;
+  --ok: #34d399;
+  --ok-soft: #0d2b22;
+  --warn: #fbbf24;
+  --warn-soft: #2e2210;
+  --bad: #f87171;
+  --bad-soft: #2d1417;
+  --info: #38bdf8;
+  --info-soft: #0c2436;
+  --muted-soft: #21263c;
+  --sidebar: #1e2124;
+  --sidebar-2: #2a2e32;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, 0.72);
 }
 
 * { box-sizing: border-box; }
@@ -654,4 +688,23 @@ table.tbl tbody tr.clickable:hover { background: var(--surface-2); }
   /* подписи и значения в столбик — иначе узкие колонки рвут слова */
   .modal .kv { flex-direction: column; align-items: flex-start; gap: 2px; padding: 9px 0; }
   .modal .kv span { white-space: nowrap; }
+}
+
+/* ─── Переключатель темы ──────────────────────────────────── */
+.theme-switch button { padding: 6px 9px; display: grid; place-items: center; }
+.theme-switch svg { font-size: 14px; }
+.user-pop-lang + .user-pop-lang { border-top: 0; }
+
+body,
+.card,
+.sidebar,
+.topbar,
+.select-btn,
+.input,
+.textarea,
+.btn {
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  body, .card, .sidebar, .topbar, .select-btn, .input, .textarea, .btn { transition: none; }
 }

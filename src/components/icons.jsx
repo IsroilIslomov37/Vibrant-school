@@ -25,6 +25,8 @@ import {
   FiKey,
   FiLock,
   FiMenu,
+  FiMonitor,
+  FiMoon,
   FiPause,
   FiPhone,
   FiPlay,
@@ -35,6 +37,7 @@ import {
   FiSettings,
   FiSlash,
   FiSmile,
+  FiSun,
   FiStar,
   FiTarget,
   FiUser,
@@ -85,6 +88,11 @@ export const IconMenu = FiMenu
 export const IconBack = FiChevronLeft
 export const IconForward = FiChevronRight
 export const IconChevron = FiChevronDown
+
+/* Тема оформления */
+export const IconLight = FiSun
+export const IconDark = FiMoon
+export const IconSystem = FiMonitor
 export const IconSend = FiSend
 export const IconAddUser = FiUserPlus
 
