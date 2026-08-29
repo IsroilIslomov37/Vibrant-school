@@ -1,3 +1,4 @@
+import { ToastContainer } from 'react-toastify'
 import Login from './components/Login.jsx'
 import { useLang } from './data/i18n.js'
 import { useStore } from './data/store.js'
@@ -10,8 +11,13 @@ export default function App() {
   // подписка на язык: смена языка перерисовывает всё дерево
   useLang()
 
-  if (!currentUser) return <Login />
-  if (currentUser.role === 'admin') return <AdminApp />
-  if (currentUser.role === 'teacher') return <TeacherApp />
-  return <StudentApp />
+  return (
+    <>
+      {!currentUser && <Login />}
+      {currentUser?.role === 'admin' && <AdminApp />}
+      {currentUser?.role === 'teacher' && <TeacherApp />}
+      {currentUser?.role === 'student' && <StudentApp />}
+      <ToastContainer newestOnTop limit={3} theme="colored" />
+    </>
+  )
 }

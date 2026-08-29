@@ -15,7 +15,8 @@ import {
   IconWarning,
   IconCheck,
 } from '../components/icons.jsx'
-import { Avatar, Badge, Card, Empty, Field, Kpi, Modal, Progress, Segmented } from '../components/ui.jsx'
+import { notify } from '../components/toast.js'
+import { Avatar, Badge, Card, Empty, Field, Kpi, Modal, Progress, Segmented, Select } from '../components/ui.jsx'
 import { courseById } from '../data/seed.js'
 import { answerText, feedbackText, levelLabel, roomLabel, scheduleLabel, t } from '../data/i18n.js'
 import {
@@ -233,10 +234,15 @@ function GradingPage({ ctx }) {
             { value: 'all', label: t('common.all') },
           ]}
         />
-        <select className="select" style={{ width: 200 }} value={group} onChange={(e) => setGroup(e.target.value)}>
-          <option value="all">{t('common.allGroups')}</option>
-          {myGroups.map((g) => (<option key={g.id} value={g.id}>{g.name} · {levelLabel(g.level)}</option>))}
-        </select>
+        <Select
+          width={215}
+          value={group}
+          onChange={setGroup}
+          options={[
+            { value: 'all', label: t('common.allGroups') },
+            ...myGroups.map((g) => ({ value: g.id, label: g.name, hint: levelLabel(g.level) })),
+          ]}
+        />
       </div>
 
       <Card tight>
@@ -319,6 +325,7 @@ function GradeModal({ row, onClose }) {
             disabled={!valid}
             onClick={() => {
               gradeSubmission(s.id, score, feedback)
+              notify.success(t('toast.graded', { score, name: student.name }))
               onClose()
             }}
           >
@@ -443,6 +450,7 @@ function AssignmentsPage({ ctx }) {
           groups={myGroups}
           onSave={(gid, data) => {
             createAssignment(gid, { ...data, teacherId: currentUser.id })
+            notify.success(t('toast.assignmentCreated', { group: myGroups.find((g) => g.id === gid)?.name }))
             setCreating(false)
           }}
           onClose={() => setCreating(false)}
@@ -477,13 +485,15 @@ function NewAssignmentModal({ groups, onSave, onClose, studentsIn }) {
     >
       <div className="stack">
         <Field label={t('common.group')}>
-          <select className="select" value={groupId} onChange={(e) => setGroupId(e.target.value)}>
-            {groups.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name} · {levelLabel(g.level)} · {t('unit.students', { n: studentsIn(g.id) })}
-              </option>
-            ))}
-          </select>
+          <Select
+            value={groupId}
+            onChange={setGroupId}
+            options={groups.map((g) => ({
+              value: g.id,
+              label: g.name + ' · ' + levelLabel(g.level),
+              hint: t('unit.students', { n: studentsIn(g.id) }),
+            }))}
+          />
         </Field>
         <Field label={t('teacher.taskTitle')}>
           <input
@@ -542,7 +552,21 @@ function GroupsPage({ ctx }) {
                 </div>
                 <Progress value={p} tone="info" />
               </div>
-              <button className="btn sm" onClick={() => markLessonDone(g.id)}><IconCheck /> {t('teacher.markLesson')}</button>
+              <button
+                className="btn sm"
+                onClick={() => {
+                  markLessonDone(g.id)
+                  notify.info(
+                    t('toast.lessonMarked', {
+                      group: g.name,
+                      done: Math.min(course.totalLessons, g.lessonsDone + 1),
+                      total: course.totalLessons,
+                    }),
+                  )
+                }}
+              >
+                <IconCheck /> {t('teacher.markLesson')}
+              </button>
               <div className="divider" />
               <div className="stack" style={{ gap: 0 }}>
                 {enr.slice(0, 6).map((e) => {
@@ -596,10 +620,15 @@ function StudentsPage({ ctx }) {
           <IconSearch className="search-ico" />
           <input className="input" placeholder={t('common.searchStudent')} value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
-        <select className="select" style={{ width: 220 }} value={group} onChange={(e) => setGroup(e.target.value)}>
-          <option value="all">{t('common.allGroups')}</option>
-          {myGroups.map((g) => (<option key={g.id} value={g.id}>{g.name} · {levelLabel(g.level)}</option>))}
-        </select>
+        <Select
+          width={230}
+          value={group}
+          onChange={setGroup}
+          options={[
+            { value: 'all', label: t('common.allGroups') },
+            ...myGroups.map((g) => ({ value: g.id, label: g.name, hint: levelLabel(g.level) })),
+          ]}
+        />
       </div>
 
       <Card tight>

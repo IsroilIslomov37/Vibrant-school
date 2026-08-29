@@ -12,6 +12,7 @@ import {
   FiCheck,
   FiCheckCircle,
   FiChevronLeft,
+  FiChevronDown,
   FiChevronRight,
   FiClipboard,
   FiClock,
@@ -83,6 +84,7 @@ export const IconLogout = FiPower
 export const IconMenu = FiMenu
 export const IconBack = FiChevronLeft
 export const IconForward = FiChevronRight
+export const IconChevron = FiChevronDown
 export const IconSend = FiSend
 export const IconAddUser = FiUserPlus
 

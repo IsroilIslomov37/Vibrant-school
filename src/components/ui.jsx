@@ -1,7 +1,7 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { t } from '../data/i18n.js'
 import { initials } from '../data/store.js'
-import { CourseIcon, IconClose, IconEmpty } from './icons.jsx'
+import { CourseIcon, IconCheck, IconChevron, IconClose, IconEmpty } from './icons.jsx'
 
 export function Card({ title, sub, right, children, tight, className = '' }) {
   return (
@@ -158,5 +158,130 @@ export function CourseChip({ course, status }) {
       {course.name}
       {status && <i className={'dot badge ' + tone} style={{ width: 6, height: 6, padding: 0, borderRadius: '50%' }} />}
     </span>
+  )
+}
+
+/**
+ * Выпадающий список вместо нативного <select>: нативные <option>
+ * рисует ОС, поэтому в тёмной теме и на телефоне они выглядят чужеродно.
+ * Попап позиционируется fixed — иначе его обрезает прокрутка модалки.
+ */
+export function Select({ value, onChange, options, placeholder, width, disabled = false }) {
+  const [open, setOpen] = useState(false)
+  const [rect, setRect] = useState(null)
+  const btnRef = useRef(null)
+  const popRef = useRef(null)
+
+  const current = options.find((o) => o.value === value)
+
+  const place = useCallback(() => {
+    const el = btnRef.current
+    if (!el) return
+    const r = el.getBoundingClientRect()
+    const below = window.innerHeight - r.bottom
+    setRect({
+      left: r.left,
+      width: r.width,
+      top: below > 220 ? r.bottom + 6 : null,
+      bottom: below > 220 ? null : window.innerHeight - r.top + 6,
+      maxHeight: Math.max(160, (below > 220 ? below : r.top) - 24),
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!open) return
+    place()
+    const onDown = (e) => {
+      if (!btnRef.current?.contains(e.target) && !popRef.current?.contains(e.target)) setOpen(false)
+    }
+    const onKey = (e) => e.key === 'Escape' && setOpen(false)
+    window.addEventListener('mousedown', onDown)
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('resize', place)
+    window.addEventListener('scroll', place, true)
+    return () => {
+      window.removeEventListener('mousedown', onDown)
+      window.removeEventListener('keydown', onKey)
+      window.removeEventListener('resize', place)
+      window.removeEventListener('scroll', place, true)
+    }
+  }, [open, place])
+
+  const pick = (v) => {
+    onChange(v)
+    setOpen(false)
+    btnRef.current?.focus()
+  }
+
+  const move = (dir) => {
+    const i = options.findIndex((o) => o.value === value)
+    const next = options[Math.min(options.length - 1, Math.max(0, (i < 0 ? 0 : i) + dir))]
+    if (next) onChange(next.value)
+  }
+
+  return (
+    <div className="select-wrap" style={width ? { width } : undefined}>
+      <button
+        ref={btnRef}
+        type="button"
+        className={'select-btn' + (open ? ' open' : '')}
+        disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowDown') {
+            e.preventDefault()
+            if (open) move(1)
+            else setOpen(true)
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault()
+            move(-1)
+          } else if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setOpen((v) => !v)
+          }
+        }}
+      >
+        <span className="select-value">
+          {current?.icon && <span className="ic">{current.icon}</span>}
+          <span className="select-text">{current ? current.label : placeholder || '—'}</span>
+        </span>
+        <IconChevron className="select-caret" />
+      </button>
+
+      {open && rect && (
+        <div
+          ref={popRef}
+          className="select-pop"
+          role="listbox"
+          style={{
+            left: rect.left,
+            width: rect.width,
+            top: rect.top ?? undefined,
+            bottom: rect.bottom ?? undefined,
+            maxHeight: rect.maxHeight,
+          }}
+        >
+          {options.map((o) => (
+            <button
+              key={o.value}
+              type="button"
+              role="option"
+              aria-selected={o.value === value}
+              className={'select-item' + (o.value === value ? ' on' : '')}
+              onClick={() => pick(o.value)}
+            >
+              {o.icon && <span className="ic">{o.icon}</span>}
+              <span className="select-item-text">
+                {o.label}
+                {o.hint && <span className="select-hint">{o.hint}</span>}
+              </span>
+              {o.value === value && <IconCheck className="select-tick" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }

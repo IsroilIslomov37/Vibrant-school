@@ -21,7 +21,8 @@ import {
   IconParents,
   IconClock,
 } from '../components/icons.jsx'
-import { Avatar, Badge, Card, Empty, Kpi, Modal, Progress, Ring } from '../components/ui.jsx'
+import { notify } from '../components/toast.js'
+import { Avatar, Badge, Card, Empty, Kpi, Modal, Progress, Ring, Select } from '../components/ui.jsx'
 import { feedbackText, levelLabel, payMethod, scheduleLabel, t } from '../data/i18n.js'
 import { fmtDate, HW_META, money, selectStudentProfile, STATUS_META, useStore } from '../data/store.js'
 
@@ -208,16 +209,36 @@ export default function StudentDetail({ studentId, role, onBack, backLabel }) {
                         <IconPayments /> {t('detail.acceptPayment')}
                       </button>
                       {c.enrollment.frozen ? (
-                        <button className="btn sm" onClick={() => setEnrollmentFrozen(c.enrollment.id, false)}>
+                        <button
+                          className="btn sm"
+                          onClick={() => {
+                            setEnrollmentFrozen(c.enrollment.id, false)
+                            notify.info(t('toast.unfrozen', { course: c.course.name }))
+                          }}
+                        >
                           <IconPlay /> {t('detail.unfreeze')}
                         </button>
                       ) : (
-                        <button className="btn sm" onClick={() => setEnrollmentFrozen(c.enrollment.id, true)}>
+                        <button
+                          className="btn sm"
+                          onClick={() => {
+                            setEnrollmentFrozen(c.enrollment.id, true)
+                            notify.warn(t('toast.frozen', { course: c.course.name }))
+                          }}
+                        >
                           <IconPause /> {t('detail.freeze')}
                         </button>
                       )}
                       {c.status !== 'unpaid' && (
-                        <button className="btn danger sm" onClick={() => deactivateEnrollment(c.enrollment.id)}>{t('detail.deactivate')}</button>
+                        <button
+                          className="btn danger sm"
+                          onClick={() => {
+                            deactivateEnrollment(c.enrollment.id)
+                            notify.warn(t('toast.deactivated', { course: c.course.name }))
+                          }}
+                        >
+                          {t('detail.deactivate')}
+                        </button>
                       )}
                     </div>
                   )}
@@ -312,6 +333,7 @@ export default function StudentDetail({ studentId, role, onBack, backLabel }) {
           taken={courses.map((c) => c.group?.id)}
           onEnroll={(gid) => {
             enrollStudent(studentId, gid)
+            notify.success(t('toast.enrolled', { group: db.groups.find((g) => g.id === gid)?.name }))
             setAddCourse(false)
           }}
           onClose={() => setAddCourse(false)}
@@ -340,17 +362,17 @@ function AddCourseModal({ taken, onEnroll, onClose }) {
     >
       <div className="field">
         <label>{t('common.group')}</label>
-        <select className="select" value={groupId} onChange={(e) => setGroupId(e.target.value)}>
-          <option value="">{t('detail.choose')}</option>
-          {free.map((g) => {
-            const teacher = db.teachers.find((x) => x.id === g.teacherId)
-            return (
-              <option key={g.id} value={g.id}>
-                {g.name} · {levelLabel(g.level)} · {scheduleLabel(g)} · {teacher?.name}
-              </option>
-            )
-          })}
-        </select>
+        <Select
+          value={groupId}
+          onChange={setGroupId}
+          placeholder={t('detail.choose')}
+          options={free.map((g) => ({
+            value: g.id,
+            label: g.name + ' · ' + levelLabel(g.level),
+            hint: scheduleLabel(g) + ' · ' + db.teachers.find((x) => x.id === g.teacherId)?.name,
+            icon: <CourseIcon id={g.courseId} />,
+          }))}
+        />
       </div>
     </Modal>
   )

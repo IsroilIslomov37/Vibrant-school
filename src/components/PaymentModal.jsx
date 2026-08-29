@@ -3,7 +3,8 @@ import { courseById } from '../data/seed.js'
 import { levelLabel, payMethod, scheduleLabel, t } from '../data/i18n.js'
 import { daysLeft, enrollmentStatus, fmtDate, money, STATUS_META, useStore } from '../data/store.js'
 import { IconCheck, IconInfo, IconOk } from './icons.jsx'
-import { Badge, Field, Modal } from './ui.jsx'
+import { notify } from './toast.js'
+import { Badge, Field, Modal, Select } from './ui.jsx'
 
 const METHODS = ['cash', 'click', 'payme', 'terminal', 'transfer']
 
@@ -29,6 +30,9 @@ export default function PaymentModal({ enrollment, onClose }) {
 
   const save = () => {
     acceptPayment(enrollment.id, { months, amount, method, comment, by: currentUser.id })
+    notify.success(
+      t('toast.paymentAccepted', { name: student.name, course: course.name, date: fmtDate(newUntil) }),
+    )
     onClose()
   }
 
@@ -79,18 +83,14 @@ export default function PaymentModal({ enrollment, onClose }) {
 
         <div className="grid g2">
           <Field label={t('pay.months')}>
-            <select className="select" value={months} onChange={(e) => setMonths(Number(e.target.value))}>
-              {[1, 2, 3, 6, 12].map((m) => (
-                <option key={m} value={m}>{t('unit.months', { n: m })}</option>
-              ))}
-            </select>
+            <Select
+              value={months}
+              onChange={setMonths}
+              options={[1, 2, 3, 6, 12].map((m) => ({ value: m, label: t('unit.months', { n: m }) }))}
+            />
           </Field>
           <Field label={t('pay.method')}>
-            <select className="select" value={method} onChange={(e) => setMethod(e.target.value)}>
-              {METHODS.map((m) => (
-                <option key={m} value={m}>{payMethod(m)}</option>
-              ))}
-            </select>
+            <Select value={method} onChange={setMethod} options={METHODS.map((m) => ({ value: m, label: payMethod(m) }))} />
           </Field>
         </div>
 

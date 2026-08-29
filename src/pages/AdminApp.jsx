@@ -26,7 +26,8 @@ import {
   IconTeachers,
   IconWarning,
 } from '../components/icons.jsx'
-import { Avatar, Badge, Card, Empty, Field, Kpi, Modal, Progress, Segmented } from '../components/ui.jsx'
+import { notify } from '../components/toast.js'
+import { Avatar, Badge, Card, Empty, Field, Kpi, Modal, Progress, Segmented, Select } from '../components/ui.jsx'
 import { CENTER, COURSES, courseById } from '../data/seed.js'
 import { annText, annTitle, levelLabel, payMethod, roomLabel, scheduleLabel, t } from '../data/i18n.js'
 import {
@@ -336,10 +337,15 @@ function StudentsPage({ profiles, go }) {
             { value: 'frozen', label: t('status.frozen'), count: counts.frozen },
           ]}
         />
-        <select className="select" style={{ width: 190 }} value={course} onChange={(e) => setCourse(e.target.value)}>
-          <option value="all">{t('common.allCourses')}</option>
-          {COURSES.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
-        </select>
+        <Select
+          width={195}
+          value={course}
+          onChange={setCourse}
+          options={[
+            { value: 'all', label: t('common.allCourses') },
+            ...COURSES.map((c) => ({ value: c.id, label: c.name, icon: <CourseIcon id={c.id} /> })),
+          ]}
+        />
         <button className="btn primary spacer" onClick={() => setAdding(true)}><IconPlus /> {t('admin.addStudent')}</button>
       </div>
 
@@ -412,6 +418,7 @@ function StudentsPage({ profiles, go }) {
           teachers={db.teachers}
           onSave={(data) => {
             addStudent(data)
+            notify.success(t('toast.studentAdded', { name: data.name }))
             setAdding(false)
           }}
           onClose={() => setAdding(false)}
@@ -724,10 +731,15 @@ function GroupsPage() {
   return (
     <div className="stack">
       <div className="row wrap">
-        <select className="select" style={{ width: 220 }} value={course} onChange={(e) => setCourse(e.target.value)}>
-          <option value="all">{t('common.allCourses')}</option>
-          {COURSES.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
-        </select>
+        <Select
+          width={230}
+          value={course}
+          onChange={setCourse}
+          options={[
+            { value: 'all', label: t('common.allCourses') },
+            ...COURSES.map((c) => ({ value: c.id, label: c.name, icon: <CourseIcon id={c.id} /> })),
+          ]}
+        />
       </div>
       <div className="grid g3">
         {rows.map((r) => (
@@ -844,10 +856,15 @@ function HomeworkPage() {
   return (
     <div className="stack">
       <div className="row wrap">
-        <select className="select" style={{ width: 220 }} value={course} onChange={(e) => setCourse(e.target.value)}>
-          <option value="all">{t('common.allCourses')}</option>
-          {COURSES.map((c) => (<option key={c.id} value={c.id}>{c.name}</option>))}
-        </select>
+        <Select
+          width={230}
+          value={course}
+          onChange={setCourse}
+          options={[
+            { value: 'all', label: t('common.allCourses') },
+            ...COURSES.map((c) => ({ value: c.id, label: c.name, icon: <CourseIcon id={c.id} /> })),
+          ]}
+        />
         <span className="small muted spacer">{t('admin.lastTasks', { n: rows.length })}</span>
       </div>
       <Card tight>
@@ -932,6 +949,7 @@ function SettingsPage() {
                 className="btn danger"
                 onClick={() => {
                   resetDatabase()
+                  notify.info(t('toast.dbReset'))
                   setConfirm(false)
                 }}
               >

@@ -87,12 +87,21 @@ export const HW_META = {
   missing: hwMeta('missing', 'bad'),
 }
 
+/** Ярлык успеваемости. label — геттер: попадает в мемоизированные
+ *  профили, но текст берётся из словаря уже при отрисовке. */
+const perfMeta = (key, tone) => ({
+  tone,
+  get label() {
+    return t('perf.' + key)
+  },
+})
+
 export function performanceLabel(avg) {
-  if (avg == null) return { label: t('perf.none'), tone: 'muted' }
-  if (avg >= 90) return { label: t('perf.excellent'), tone: 'ok' }
-  if (avg >= 75) return { label: t('perf.good'), tone: 'info' }
-  if (avg >= 60) return { label: t('perf.ok'), tone: 'warn' }
-  return { label: t('perf.attention'), tone: 'bad' }
+  if (avg == null) return perfMeta('none', 'muted')
+  if (avg >= 90) return perfMeta('excellent', 'ok')
+  if (avg >= 75) return perfMeta('good', 'info')
+  if (avg >= 60) return perfMeta('ok', 'warn')
+  return perfMeta('attention', 'bad')
 }
 
 export { fmtDate, money } from './i18n.js'

@@ -34,7 +34,7 @@ export function StoreProvider({ children }) {
       if (!user) return { ok: false, error: t('login.errNoUser') }
       if (user.password !== password) return { ok: false, error: t('login.errPassword') }
       setSession({ id: user.id, role: user.role })
-      return { ok: true, role: user.role }
+      return { ok: true, role: user.role, name: user.name.split(' ').slice(1).join(' ') || user.name }
     },
     [db],
   )

@@ -20,7 +20,8 @@ import {
   IconTeacher,
   IconWarning,
 } from '../components/icons.jsx'
-import { Avatar, Badge, Card, Empty, Kpi, Modal, Progress, Ring, Segmented } from '../components/ui.jsx'
+import { notify } from '../components/toast.js'
+import { Avatar, Badge, Card, Empty, Kpi, Modal, Progress, Ring, Segmented, Select } from '../components/ui.jsx'
 import { CENTER } from '../data/seed.js'
 import { feedbackText, levelLabel, payMethod, roomLabel, scheduleLabel, t, taskDesc } from '../data/i18n.js'
 import { fmtDate, HW_META, money, selectStudentProfile, STATUS_META, useStore } from '../data/store.js'
@@ -327,10 +328,19 @@ function HomeworkPage({ profile }) {
             { value: 'all', label: t('common.all') },
           ]}
         />
-        <select className="select" style={{ width: 200 }} value={course} onChange={(e) => setCourse(e.target.value)}>
-          <option value="all">{t('common.allCourses')}</option>
-          {profile.courses.map((c) => (<option key={c.course.id} value={c.course.id}>{c.course.name}</option>))}
-        </select>
+        <Select
+          width={215}
+          value={course}
+          onChange={setCourse}
+          options={[
+            { value: 'all', label: t('common.allCourses') },
+            ...profile.courses.map((c) => ({
+              value: c.course.id,
+              label: c.course.name,
+              icon: <CourseIcon id={c.course.id} />,
+            })),
+          ]}
+        />
       </div>
 
       <Card tight>
@@ -353,7 +363,7 @@ function HomeworkPage({ profile }) {
                 const locked = r.c.status === 'unpaid' || r.c.status === 'frozen'
                 return (
                   <tr key={r.s.id}>
-                    <td><b>{r.a.title}</b><div className="small muted">{taskDesc(r.a.description)}</div></td>
+                    <td><b>{r.a.title}</b><div className="small muted hide-sm">{taskDesc(r.a.description)}</div></td>
                     <td className="small"><span className="ic"><CourseIcon id={r.c.course.id} /></span> {r.c.course.name}</td>
                     <td className="mono small">{fmtDate(r.a.dueDate)}</td>
                     <td><Badge tone={m.tone} dot>{m.label}</Badge></td>
@@ -387,6 +397,7 @@ function HomeworkPage({ profile }) {
           row={open}
           onSubmit={(text) => {
             submitHomework(open.s.id, text)
+            notify.success(t('toast.homeworkSubmitted'))
             setOpen(null)
           }}
           onClose={() => setOpen(null)}

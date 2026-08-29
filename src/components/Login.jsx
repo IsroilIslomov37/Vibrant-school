@@ -3,6 +3,7 @@ import logoUrl from '../assets/logo.png'
 import { CENTER, COURSES } from '../data/seed.js'
 import { courseName, t } from '../data/i18n.js'
 import { useStore } from '../data/store.js'
+import { notify } from './toast.js'
 import { CourseIcon, IconAward, IconStudents, IconTeacher, IconWarning } from './icons.jsx'
 import { LangSwitch } from './Layout.jsx'
 import { Field } from './ui.jsx'
@@ -24,7 +25,12 @@ export default function Login() {
   const submit = (e) => {
     e.preventDefault()
     const res = login(form.login, form.password)
-    if (!res.ok) setError(res.error)
+    if (!res.ok) {
+      setError(res.error)
+      notify.error(res.error)
+      return
+    }
+    notify.success(t('toast.welcome', { name: res.name }))
   }
 
   const [line1, line2] = t('login.heroTitle').split('\n')
