@@ -639,3 +639,19 @@ table.tbl tbody tr.clickable:hover { background: var(--surface-2); }
   table.tbl th { padding: 9px 10px; }
   table.tbl td { padding: 10px; }
 }
+
+/* ─── Модалка не должна вылезать за экран ─────────────────── */
+.modal { min-width: 0; }
+.modal-foot { flex-wrap: wrap; }
+.modal-foot .btn { min-width: 0; }
+.modal .kv b { min-width: 0; overflow-wrap: break-word; }
+
+@media (max-width: 560px) {
+  .overlay { padding: 12px; }
+  .modal-foot { flex-direction: column-reverse; align-items: stretch; }
+  .modal-foot .btn { width: 100%; white-space: normal; }
+  .modal-head h2 { font-size: 15px; }
+  /* подписи и значения в столбик — иначе узкие колонки рвут слова */
+  .modal .kv { flex-direction: column; align-items: flex-start; gap: 2px; padding: 9px 0; }
+  .modal .kv span { white-space: nowrap; }
+}
