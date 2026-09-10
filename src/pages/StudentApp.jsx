@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { Layout } from '../components/Layout.jsx'
 import {
   CourseIcon,
-  IconAward,
   IconClock,
   IconCourses,
   IconEmpty,
@@ -16,14 +15,13 @@ import {
   IconSchedule,
   IconSmile,
   IconStar,
-  IconTarget,
   IconTeacher,
   IconWarning,
 } from '../components/icons.jsx'
 import { notify } from '../components/toast.js'
 import { Avatar, Badge, Card, Empty, Kpi, Modal, Progress, Ring, Segmented, Select } from '../components/ui.jsx'
 import { CENTER } from '../data/seed.js'
-import { feedbackText, levelLabel, payMethod, roomLabel, scheduleLabel, t, taskDesc } from '../data/i18n.js'
+import { feedbackText, levelLabel, roomLabel, scheduleLabel, t, taskDesc } from '../data/i18n.js'
 import { fmtDate, HW_META, money, selectStudentProfile, STATUS_META, useStore } from '../data/store.js'
 
 export default function StudentApp() {
@@ -50,15 +48,14 @@ export default function StudentApp() {
   ]
 
   const TITLES = {
-    dashboard: [t('student.titleDashboard'), t('student.subDashboard')],
-    courses: [t('student.titleCourses'), t('student.subCourses')],
-    homework: [t('student.titleHomework'), t('student.subHomework')],
-    payments: [t('student.titlePayments'), t('student.subPayments')],
+    dashboard: t('student.titleDashboard'),
+    courses: t('student.titleCourses'),
+    homework: t('student.titleHomework'),
+    payments: t('student.titlePayments'),
   }
-  const [title, sub] = TITLES[route.page]
 
   return (
-    <Layout nav={nav} route={route} go={go} title={title} sub={sub} actions={<Badge tone={meta.tone} dot lg>{meta.label}</Badge>}>
+    <Layout nav={nav} route={route} go={go} title={TITLES[route.page]} actions={<Badge tone={meta.tone} dot lg>{meta.label}</Badge>}>
       {route.page === 'dashboard' && <Dashboard profile={profile} go={go} />}
       {route.page === 'courses' && <CoursesPage profile={profile} />}
       {route.page === 'homework' && <HomeworkPage profile={profile} />}
@@ -77,14 +74,14 @@ function Dashboard({ profile, go }) {
     .map((s) => ({ s, a: db.assignments.find((x) => x.id === s.assignmentId) }))
     .filter((r) => r.a)
     .sort((a, b) => a.a.dueDate.localeCompare(b.a.dueDate))
-    .slice(0, 6)
+    .slice(0, 5)
 
   const lastGrades = db.submissions
     .filter((s) => s.studentId === profile.student.id && s.status === 'graded')
     .map((s) => ({ s, a: db.assignments.find((x) => x.id === s.assignmentId) }))
     .filter((r) => r.a)
     .sort((a, b) => (b.s.gradedAt || '').localeCompare(a.s.gradedAt || ''))
-    .slice(0, 6)
+    .slice(0, 5)
 
   return (
     <div className="stack">
@@ -95,21 +92,13 @@ function Dashboard({ profile, go }) {
             <div className="row wrap" style={{ gap: 10 }}>
               <h1 style={{ fontSize: 22 }}>{profile.student.name}</h1>
               <Badge tone={meta.tone} dot lg>{meta.label}</Badge>
-              <Badge tone={profile.performance.tone}>{profile.performance.label}</Badge>
             </div>
-            <p className="small muted" style={{ marginTop: 6 }}>
-              {t('student.headerSub', {
-                center: CENTER.name,
-                date: fmtDate(profile.student.joinedAt),
-                n: profile.courses.length,
-              })}
-            </p>
             <div className="row wrap" style={{ gap: 7, marginTop: 12 }}>
               {profile.courses.map((c) => (
                 <span className="chip" key={c.enrollment.id}>
                   <span className="swatch" style={{ background: c.course.color + '26' }}><CourseIcon id={c.course.id} /></span>
                   {c.course.name}
-                  <Badge tone={STATUS_META[c.status].tone}>{STATUS_META[c.status].label}</Badge>
+                  {c.status !== 'active' && <Badge tone={STATUS_META[c.status].tone}>{STATUS_META[c.status].label}</Badge>}
                 </span>
               ))}
             </div>
@@ -151,33 +140,25 @@ function Dashboard({ profile, go }) {
         </div>
       )}
 
-      <div className="grid g4">
-        <Kpi label={t('admin.kpiAvg')} value={profile.avgScore ?? '—'} foot={t('student.kpiAvgFoot')} icon={IconStar} tone="warn" />
+      <div className="grid g3">
+        <Kpi label={t('admin.kpiAvg')} value={profile.avgScore ?? '—'} icon={IconStar} tone="warn" />
         <Kpi
           label={t('student.kpiDone')}
           value={`${profile.hwDone} / ${profile.hwTotal}`}
-          foot={`${profile.hwProgress}%`}
+          foot={t('student.kpiWaitingFoot', { n: profile.hwPending })}
           icon={IconHomework}
           tone="ok"
         />
         <Kpi
-          label={t('student.kpiWaiting')}
-          value={profile.hwTotal - profile.hwDone - profile.hwPending}
-          foot={t('student.kpiWaitingFoot', { n: profile.hwPending })}
-          icon={IconClock}
-          tone="info"
-        />
-        <Kpi
           label={t('student.kpiLate')}
           value={profile.hwMissing}
-          foot={t('student.kpiLateFoot')}
           icon={IconWarning}
           tone={profile.hwMissing ? 'bad' : 'muted'}
         />
       </div>
 
       <div className="grid g2">
-        <Card title={t('student.upcoming')} sub={t('student.upcomingSub')} tight>
+        <Card title={t('student.upcoming')} tight>
           {upcoming.map(({ s, a }) => {
             const c = profile.courses.find((x) => x.course.id === a.courseId)
             const m = HW_META[s.status]
@@ -243,8 +224,7 @@ function CoursesPage({ profile }) {
                   </div>
                 </div>
               )}
-              <p className="small muted">{c.course.description}</p>
-              <div className="small muted"><IconTeacher /> {c.teacher?.name} · {c.teacher?.title || t('role.teacher')}</div>
+              <div className="small muted"><IconTeacher /> {c.teacher?.name}</div>
               <div className="small muted"><IconSchedule /> {c.group && scheduleLabel(c.group)} · {roomLabel(c.group?.room)}</div>
               <div>
                 <div className="row small muted" style={{ marginBottom: 5 }}>
@@ -264,7 +244,6 @@ function CoursesPage({ profile }) {
               </div>
               <div className="row wrap" style={{ gap: 6 }}>
                 <Badge tone="warn"><IconStar /> {t('detail.avgBadge', { v: c.avgScore ?? '—' })}</Badge>
-                <Badge tone="info"><IconTarget /> {t('detail.attendanceBadge', { v: c.attendance })}</Badge>
                 {c.hwMissing > 0 && <Badge tone="bad">{t('detail.missingBadge', { n: c.hwMissing })}</Badge>}
               </div>
               <div className="divider" />
@@ -363,7 +342,7 @@ function HomeworkPage({ profile }) {
                 const locked = r.c.status === 'unpaid' || r.c.status === 'frozen'
                 return (
                   <tr key={r.s.id}>
-                    <td><b>{r.a.title}</b><div className="small muted hide-sm">{taskDesc(r.a.description)}</div></td>
+                    <td><b>{r.a.title}</b></td>
                     <td className="small"><span className="ic"><CourseIcon id={r.c.course.id} /></span> {r.c.course.name}</td>
                     <td className="mono small">{fmtDate(r.a.dueDate)}</td>
                     <td><Badge tone={m.tone} dot>{m.label}</Badge></td>
@@ -464,14 +443,7 @@ function PaymentsPage({ profile }) {
         </div>
       </div>
 
-      <div className="grid g3">
-        <Kpi
-          label={t('student.kpiStatus')}
-          value={STATUS_META[profile.status].label}
-          foot={STATUS_META[profile.status].hint}
-          icon={IconAward}
-          tone={STATUS_META[profile.status].tone}
-        />
+      <div className="grid g2">
         <Kpi
           label={t('student.kpiMonthly')}
           value={money(monthly)}
@@ -494,7 +466,6 @@ function PaymentsPage({ profile }) {
             <thead>
               <tr>
                 <th>{t('common.course')}</th>
-                <th>{t('common.group')}</th>
                 <th>{t('common.status')}</th>
                 <th>{t('common.paidUntil')}</th>
                 <th>{t('student.colLeft')}</th>
@@ -507,7 +478,6 @@ function PaymentsPage({ profile }) {
                 return (
                   <tr key={c.enrollment.id}>
                     <td><b><span className="ic"><CourseIcon id={c.course.id} /></span> {c.course.name}</b></td>
-                    <td className="small muted">{c.group?.name} · {levelLabel(c.group?.level)}</td>
                     <td><Badge tone={m.tone} dot>{m.label}</Badge></td>
                     <td className="mono small">{fmtDate(c.enrollment.paidUntil)}</td>
                     <td className="mono small" style={{ color: c.daysLeft < 0 ? 'var(--bad)' : c.daysLeft <= 5 ? 'var(--warn)' : undefined }}>
@@ -531,8 +501,6 @@ function PaymentsPage({ profile }) {
                 <th>{t('common.course')}</th>
                 <th>{t('common.amount')}</th>
                 <th>{t('common.period')}</th>
-                <th>{t('common.method')}</th>
-                <th>{t('common.acceptedBy')}</th>
               </tr>
             </thead>
             <tbody>
@@ -544,8 +512,6 @@ function PaymentsPage({ profile }) {
                     <td className="small">{c?.course.name || p.courseId}</td>
                     <td className="mono"><b>{money(p.amount)}</b></td>
                     <td className="small">{t('unit.months', { n: p.months })}</td>
-                    <td className="small muted">{payMethod(p.method)}</td>
-                    <td className="small muted">{db.admins.find((a) => a.id === p.acceptedBy)?.name || '—'}</td>
                   </tr>
                 )
               })}

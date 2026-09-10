@@ -3,15 +3,12 @@ import { t } from '../data/i18n.js'
 import { initials } from '../data/store.js'
 import { CourseIcon, IconCheck, IconChevron, IconClose, IconEmpty } from './icons.jsx'
 
-export function Card({ title, sub, right, children, tight, className = '' }) {
+export function Card({ title, right, children, tight, className = '' }) {
   return (
     <section className={'card ' + className}>
       {(title || right) && (
         <header className="card-head">
-          <div>
-            {title && <h2>{title}</h2>}
-            {sub && <div className="sub">{sub}</div>}
-          </div>
+          {title && <h2>{title}</h2>}
           {right && <div className="right">{right}</div>}
         </header>
       )}

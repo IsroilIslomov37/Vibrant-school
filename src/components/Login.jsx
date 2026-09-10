@@ -4,7 +4,7 @@ import { CENTER, COURSES } from '../data/seed.js'
 import { courseName, t } from '../data/i18n.js'
 import { useStore } from '../data/store.js'
 import { notify } from './toast.js'
-import { CourseIcon, IconAward, IconStudents, IconTeacher, IconWarning } from './icons.jsx'
+import { CourseIcon, IconAward, IconEye, IconEyeOff, IconStudents, IconTeacher, IconWarning } from './icons.jsx'
 import { LangSwitch, ThemeSwitch } from './Layout.jsx'
 import { Field } from './ui.jsx'
 
@@ -12,6 +12,7 @@ export default function Login() {
   const { db, login } = useStore()
   const [form, setForm] = useState({ login: '', password: '' })
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const demoTeacher = db.teachers[0]
   const demoStudent =
@@ -94,13 +95,25 @@ export default function Login() {
               />
             </Field>
             <Field label={t('login.password')}>
-              <input
-                className="input"
-                type="password"
-                value={form.password}
-                placeholder="••••••"
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-              />
+              <div className="pw">
+                <input
+                  className="input"
+                  type={showPassword ? 'text' : 'password'}
+                  value={form.password}
+                  placeholder="••••••"
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                />
+                <button
+                  type="button"
+                  className="pw-toggle"
+                  onClick={() => setShowPassword((v) => !v)}
+                  title={t(showPassword ? 'login.hidePassword' : 'login.showPassword')}
+                  aria-label={t(showPassword ? 'login.hidePassword' : 'login.showPassword')}
+                  aria-pressed={showPassword}
+                >
+                  {showPassword ? <IconEyeOff /> : <IconEye />}
+                </button>
+              </div>
             </Field>
             {error && <div className="banner bad"><IconWarning /> {error}</div>}
             <button className="btn primary block" type="submit" style={{ padding: '11px 14px' }}>

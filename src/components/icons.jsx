@@ -18,6 +18,8 @@ import {
   FiClock,
   FiCreditCard,
   FiDollarSign,
+  FiEye,
+  FiEyeOff,
   FiFileText,
   FiHash,
   FiInbox,
@@ -103,6 +105,8 @@ export const IconPhone = FiPhone
 export const IconParents = FiUsers
 export const IconDate = FiCalendar
 export const IconLogin = FiKey
+export const IconEye = FiEye
+export const IconEyeOff = FiEyeOff
 export const IconTeacher = FiUserCheck
 export const IconSchedule = FiCalendar
 

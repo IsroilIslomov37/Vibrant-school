@@ -74,20 +74,19 @@ export default function AdminApp() {
   ]
 
   const TITLES = {
-    dashboard: [t('admin.titleDashboard'), t('admin.subDashboard')],
-    students: [t('admin.titleStudents'), t('admin.subStudents')],
-    payments: [t('admin.titlePayments'), t('admin.subPayments')],
-    courses: [t('admin.titleCourses'), t('admin.subCourses')],
-    groups: [t('admin.titleGroups'), t('admin.subGroups')],
-    teachers: [t('admin.titleTeachers'), t('admin.subTeachers')],
-    homework: [t('admin.titleHomework'), t('admin.subHomework')],
-    settings: [t('admin.titleSettings'), t('admin.subSettings')],
-    student: [t('admin.titleStudent'), t('admin.subStudent')],
+    dashboard: t('admin.titleDashboard'),
+    students: t('admin.titleStudents'),
+    payments: t('admin.titlePayments'),
+    courses: t('admin.titleCourses'),
+    groups: t('admin.titleGroups'),
+    teachers: t('admin.titleTeachers'),
+    homework: t('admin.titleHomework'),
+    settings: t('admin.titleSettings'),
+    student: t('admin.titleStudent'),
   }
-  const [title, sub] = TITLES[route.page]
 
   return (
-    <Layout nav={nav} route={route} go={go} title={title} sub={sub} actions={<Badge tone="brand" lg><IconAward /> {t('admin.badge')}</Badge>}>
+    <Layout nav={nav} route={route} go={go} title={TITLES[route.page]} actions={<Badge tone="brand" lg><IconAward /> {t('admin.badge')}</Badge>}>
       {route.page === 'dashboard' && <Dashboard profiles={profiles} stats={stats} go={go} />}
       {route.page === 'students' && <StudentsPage profiles={profiles} go={go} />}
       {route.page === 'student' && <StudentDetail studentId={route.params.id} role="admin" onBack={() => go('students')} />}
@@ -109,8 +108,6 @@ function Dashboard({ profiles, stats, go }) {
   const active = profiles.filter((p) => p.status === 'active').length
   const expiring = profiles.filter((p) => p.status === 'expiring').length
   const unpaid = profiles.filter((p) => p.status === 'unpaid').length
-  const graded = profiles.filter((p) => p.avgScore != null)
-  const avg = graded.length ? Math.round(graded.reduce((a, p) => a + p.avgScore, 0) / graded.length) : 0
   const revenue = stats.reduce((a, s) => a + s.revenue, 0)
   const debt = profiles.reduce((a, p) => a + p.debt, 0)
 
@@ -120,7 +117,7 @@ function Dashboard({ profiles, stats, go }) {
     .sort((a, b) => b.overdue - a.overdue)
     .slice(0, 8)
 
-  const recent = [...db.payments].sort((a, b) => b.paidAt.localeCompare(a.paidAt)).slice(0, 7)
+  const recent = [...db.payments].sort((a, b) => b.paidAt.localeCompare(a.paidAt)).slice(0, 5)
 
   return (
     <div className="stack">
@@ -132,9 +129,6 @@ function Dashboard({ profiles, stats, go }) {
           <div style={{ flex: 1, minWidth: 260 }}>
             <h1 style={{ fontSize: 25, color: '#fff' }}>{CENTER.name}</h1>
             <p style={{ opacity: 0.9, marginTop: 6 }}>{t('center.tagline')} · {t('center.subtitle')}</p>
-            <p style={{ opacity: 0.75, marginTop: 4, fontSize: 12.5 }}>
-              {t('center.experience', { n: CENTER.experienceYears, address: CENTER.address })}
-            </p>
           </div>
           <div className="row" style={{ gap: 26 }}>
             <div><b style={{ fontSize: 24 }}>{db.students.length}</b><div style={{ fontSize: 12, opacity: 0.8 }}>{t('login.statStudents')}</div></div>
@@ -144,7 +138,7 @@ function Dashboard({ profiles, stats, go }) {
         </div>
       </div>
 
-      <div className="grid g5">
+      <div className="grid g4">
         <Kpi
           label={t('admin.kpiActive')}
           value={active}
@@ -155,13 +149,11 @@ function Dashboard({ profiles, stats, go }) {
         <Kpi label={t('admin.kpiExpiring')} value={expiring} foot={t('admin.kpiExpiringFoot')} icon={IconClock} tone="warn" />
         <Kpi label={t('admin.kpiUnpaid')} value={unpaid} foot={t('admin.kpiUnpaidFoot', { sum: money(debt) })} icon={IconWarning} tone="bad" />
         <Kpi label={t('admin.kpiRevenue')} value={money(revenue)} foot={t('admin.kpiRevenueFoot')} icon={IconMoney} tone="brand" />
-        <Kpi label={t('admin.kpiAvg')} value={avg} foot={t('admin.kpiAvgFoot')} icon={IconStar} tone="info" />
       </div>
 
       <div className="grid g-2-1">
         <Card
           title={t('admin.attention')}
-          sub={t('admin.attentionSub')}
           right={
             <button className="btn sm" onClick={() => go('payments')}>
               {t('admin.allPayments')} <IconForward />
@@ -242,13 +234,12 @@ function Dashboard({ profiles, stats, go }) {
         </div>
       </div>
 
-      <Card title={t('admin.courseStats')} sub={t('admin.courseStatsSub')} tight>
+      <Card title={t('admin.courseStats')} tight>
         <div className="table-wrap">
           <table className="tbl">
             <thead>
               <tr>
                 <th>{t('common.course')}</th>
-                <th>{t('admin.colGroups')}</th>
                 <th>{t('admin.colStudents')}</th>
                 <th>{t('admin.colActive')}</th>
                 <th>{t('admin.colUnpaid')}</th>
@@ -269,7 +260,6 @@ function Dashboard({ profiles, stats, go }) {
                       </div>
                     </div>
                   </td>
-                  <td className="mono">{s.groups.length}</td>
                   <td className="mono">{s.students}</td>
                   <td><Badge tone="ok">{s.active}</Badge></td>
                   <td>{s.unpaid ? <Badge tone="bad">{s.unpaid}</Badge> : <span className="muted">—</span>}</td>
@@ -361,7 +351,6 @@ function StudentsPage({ profiles, go }) {
                 <th>{t('common.homework')}</th>
                 <th>{t('common.avgScore')}</th>
                 <th>{t('common.attendanceShort')}</th>
-                <th>{t('common.study')}</th>
               </tr>
             </thead>
             <tbody>
@@ -372,7 +361,7 @@ function StudentsPage({ profiles, go }) {
                     <td>
                       <div className="cell-user">
                         <Avatar name={p.student.name} size="sm" />
-                        <div><b>{p.student.name}</b><span>{t('unit.years', { n: p.student.age })} · {p.student.phone}</span></div>
+                        <div><b>{p.student.name}</b><span>{p.student.phone}</span></div>
                       </div>
                     </td>
                     <td>
@@ -401,7 +390,6 @@ function StudentsPage({ profiles, go }) {
                     </td>
                     <td className="mono"><b>{p.avgScore ?? '—'}</b></td>
                     <td className="mono small">{p.attendance}%</td>
-                    <td><Badge tone={p.performance.tone}>{p.performance.label}</Badge></td>
                   </tr>
                 )
               })}
@@ -532,7 +520,7 @@ function PaymentsPage({ go }) {
         </div>
       </div>
 
-      <div className="grid g4">
+      <div className="grid g3">
         <Kpi label={t('admin.kpiMonth')} value={money(monthRevenue)} foot={t('admin.kpiMonthFoot')} icon={IconMoney} tone="ok" />
         <Kpi label={t('admin.kpiDebt')} value={money(debt)} foot={t('admin.kpiDebtFoot', { n: unpaidEnrollments.length })} icon={IconWarning} tone="bad" />
         <Kpi
@@ -541,13 +529,6 @@ function PaymentsPage({ go }) {
           foot={t('admin.kpiExpSoonFoot')}
           icon={IconClock}
           tone="warn"
-        />
-        <Kpi
-          label={t('admin.kpiEnrollments')}
-          value={db.enrollments.filter((e) => enrollmentStatus(e) === 'active').length}
-          foot={t('admin.kpiEnrollmentsFoot', { n: db.enrollments.length })}
-          icon={IconOk}
-          tone="brand"
         />
       </div>
 
@@ -782,7 +763,7 @@ function TeachersPage() {
     const graded = subs.filter((s) => s.status === 'graded')
     const pending = subs.filter((s) => s.status === 'submitted').length
     const avg = graded.length ? Math.round(graded.reduce((a, s) => a + s.score, 0) / graded.length) : null
-    return { teacher, course: courseById(teacher.courseId), groups, students: enr.length, pending, avg, checked: graded.length }
+    return { teacher, course: courseById(teacher.courseId), groups, students: enr.length, pending, avg }
   })
 
   return (
@@ -793,10 +774,8 @@ function TeachersPage() {
             <tr>
               <th>{t('common.teacher')}</th>
               <th>{t('admin.colSubject')}</th>
-              <th>{t('admin.colExperience')}</th>
               <th>{t('nav.groups')}</th>
               <th>{t('admin.colStudents')}</th>
-              <th>{t('admin.colChecked')}</th>
               <th>{t('admin.colWaiting')}</th>
               <th>{t('admin.colGroupAvg')}</th>
               <th>{t('admin.colContacts')}</th>
@@ -812,10 +791,8 @@ function TeachersPage() {
                   </div>
                 </td>
                 <td className="small"><span className="ic"><CourseIcon id={r.course.id} /></span> {r.course.name}</td>
-                <td className="mono small">{t('unit.years', { n: r.teacher.experience })}</td>
                 <td className="small">{r.groups.map((g) => g.name).join(', ')}</td>
                 <td className="mono">{r.students}</td>
-                <td className="mono">{r.checked}</td>
                 <td>{r.pending ? <Badge tone="warn">{r.pending}</Badge> : <span className="muted">0</span>}</td>
                 <td className="mono"><b>{r.avg ?? '—'}</b></td>
                 <td className="small muted">{r.teacher.phone}<div>{r.teacher.email}</div></td>

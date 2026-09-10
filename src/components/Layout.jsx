@@ -167,7 +167,7 @@ export function Sidebar({ nav, route, go, open, onClose }) {
   )
 }
 
-export function Layout({ nav, route, go, title, sub, actions, children }) {
+export function Layout({ nav, route, go, title, actions, children }) {
   const [open, setOpen] = useState(false)
   return (
     <div className="app">
@@ -179,7 +179,6 @@ export function Layout({ nav, route, go, title, sub, actions, children }) {
           </button>
           <div className="topbar-title">
             <h1>{title}</h1>
-            {sub && <div className="sub">{sub}</div>}
           </div>
           <div className="topbar-right">
             <div className="topbar-actions">{actions}</div>

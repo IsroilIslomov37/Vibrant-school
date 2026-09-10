@@ -62,14 +62,13 @@ export default function TeacherApp() {
   ]
 
   const TITLES = {
-    dashboard: [t('teacher.titleDashboard'), t('teacher.subDashboard')],
-    grading: [t('teacher.titleGrading'), t('teacher.subGrading')],
-    groups: [t('teacher.titleGroups'), t('teacher.subGroups')],
-    students: [t('teacher.titleStudents'), t('teacher.subStudents')],
-    assignments: [t('teacher.titleAssignments'), t('teacher.subAssignments')],
-    student: [t('teacher.titleStudent'), t('teacher.subStudent')],
+    dashboard: t('teacher.titleDashboard'),
+    grading: t('teacher.titleGrading'),
+    groups: t('teacher.titleGroups'),
+    students: t('teacher.titleStudents'),
+    assignments: t('teacher.titleAssignments'),
+    student: t('teacher.titleStudent'),
   }
-  const [title, sub] = TITLES[route.page]
   const ctx = { myGroups, myEnrollments, myAssignments, mySubs, pending, course, go }
 
   return (
@@ -77,8 +76,7 @@ export default function TeacherApp() {
       nav={nav}
       route={route}
       go={go}
-      title={title}
-      sub={sub}
+      title={TITLES[route.page]}
       actions={<Badge tone="brand" lg><CourseIcon id={course.id} /> {course.name}</Badge>}
     >
       {route.page === 'dashboard' && <Dashboard ctx={ctx} />}
@@ -140,7 +138,7 @@ function Dashboard({ ctx }) {
       </div>
 
       <div className="grid g4">
-        <Kpi label={t('teacher.kpiPending')} value={pending.length} foot={t('teacher.kpiPendingFoot')} icon={IconClock} tone={pending.length ? 'warn' : 'muted'} />
+        <Kpi label={t('teacher.kpiPending')} value={pending.length} icon={IconClock} tone={pending.length ? 'warn' : 'muted'} />
         <Kpi label={t('teacher.kpiStudents')} value={studentIds.length} foot={t('teacher.kpiStudentsFoot', { n: myGroups.length })} icon={IconStudents} tone="brand" />
         <Kpi label={t('admin.kpiAvg')} value={avg} foot={t('teacher.kpiAvgFoot', { n: graded.length })} icon={IconStar} tone="ok" />
         <Kpi
@@ -153,7 +151,7 @@ function Dashboard({ ctx }) {
       </div>
 
       <div className="grid g-2-1">
-        <Card title={t('teacher.myGroups')} sub={t('teacher.myGroupsSub')} tight>
+        <Card title={t('teacher.myGroups')} tight>
           {myGroups.map((g) => {
             const enr = myEnrollments.filter((e) => e.groupId === g.id)
             const p = Math.round((g.lessonsDone / course.totalLessons) * 100)
@@ -172,9 +170,9 @@ function Dashboard({ ctx }) {
           })}
         </Card>
 
-        <Card title={t('teacher.performance')} sub={t('teacher.performanceSub')} tight>
-          {top.slice(0, 4).map((p) => (<StudentRow key={p.student.id} p={p} go={go} />))}
-          {top.length > 4 && <div className="divider" />}
+        <Card title={t('teacher.performance')} tight>
+          {top.slice(0, 3).map((p) => (<StudentRow key={p.student.id} p={p} go={go} />))}
+          {top.length > 3 && <div className="divider" />}
           {top.slice(-3).reverse().map((p) => (<StudentRow key={'w' + p.student.id} p={p} go={go} />))}
         </Card>
       </div>
@@ -415,7 +413,6 @@ function AssignmentsPage({ ctx }) {
               <tr>
                 <th>{t('common.task')}</th>
                 <th>{t('common.group')}</th>
-                <th>{t('teacher.colAssigned')}</th>
                 <th>{t('common.deadline')}</th>
                 <th>{t('admin.colGraded')}</th>
                 <th>{t('admin.colPending')}</th>
@@ -428,7 +425,6 @@ function AssignmentsPage({ ctx }) {
                 <tr key={r.a.id}>
                   <td><b>{r.a.title}</b></td>
                   <td className="small">{r.group?.name}</td>
-                  <td className="mono small">{fmtDate(r.a.assignedAt)}</td>
                   <td className="mono small">{fmtDate(r.a.dueDate)}</td>
                   <td style={{ minWidth: 130 }}>
                     <Progress value={r.total ? Math.round((r.graded / r.total) * 100) : 0} tone="ok" />
@@ -643,13 +639,11 @@ function StudentsPage({ ctx }) {
                 <th>{t('common.homework')}</th>
                 <th>{t('common.avgScore')}</th>
                 <th>{t('common.attendanceShort')}</th>
-                <th>{t('common.study')}</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => {
                 const m = STATUS_META[r.forCourse.status]
-                const perf = performanceLabel(r.forCourse.avgScore)
                 return (
                   <tr key={r.e.id} className="clickable" onClick={() => go('student', { id: r.profile.student.id })}>
                     <td>
@@ -670,7 +664,6 @@ function StudentsPage({ ctx }) {
                     </td>
                     <td className="mono"><b>{r.forCourse.avgScore ?? '—'}</b></td>
                     <td className="mono small">{r.forCourse.attendance}%</td>
-                    <td><Badge tone={perf.tone}>{perf.label}</Badge></td>
                   </tr>
                 )
               })}

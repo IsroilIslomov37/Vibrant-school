@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────
 import { courseDesc, courseName } from './i18n.js'
 
-export const SEED_VERSION = 'vibrant-v2'
+export const SEED_VERSION = 'vibrant-v3'
 
 export const CENTER = {
   name: 'Vibrant School',
@@ -97,21 +97,21 @@ export const COURSES = [
 export const courseById = (id) => COURSES.find((c) => c.id === id)
 
 // ─── Имена ───────────────────────────────────────────────────
-const MALE = ['Азиз', 'Бекзод', 'Дилшод', 'Жасур', 'Икром', 'Камол', 'Лазиз', 'Мухаммад', 'Нодир', 'Отабек', 'Рустам', 'Санжар', 'Темур', 'Улугбек', 'Фаррух', 'Шохрух', 'Элдор', 'Юсуф', 'Артём', 'Даниил', 'Кирилл', 'Максим', 'Никита', 'Роман', 'Аброр', 'Хуршид']
-const FEMALE = ['Азиза', 'Барно', 'Гулнора', 'Дилноза', 'Зарина', 'Камила', 'Лола', 'Малика', 'Нигора', 'Озода', 'Робия', 'Сабина', 'Умида', 'Феруза', 'Шахло', 'Юлдуз', 'Анастасия', 'Виктория', 'Дарья', 'Екатерина', 'Мария', 'София', 'Севара', 'Нилуфар']
-const SURNAME = ['Абдуллаев', 'Азимов', 'Бекмуродов', 'Валиев', 'Ганиев', 'Джураев', 'Эргашев', 'Жумаев', 'Зокиров', 'Ибрагимов', 'Каримов', 'Латипов', 'Мирзаев', 'Назаров', 'Обидов', 'Пулатов', 'Рахимов', 'Саидов', 'Тошматов', 'Умаров', 'Файзиев', 'Хакимов', 'Шарипов', 'Юсупов', 'Якубов', 'Иванов', 'Петров', 'Смирнов', 'Кузнецов', 'Соколов']
+const MALE = ['Aziz', 'Bekzod', 'Dilshod', 'Jasur', 'Ikrom', 'Kamol', 'Laziz', 'Muhammad', 'Nodir', 'Otabek', 'Rustam', 'Sanjar', 'Temur', 'Ulugbek', 'Farrukh', 'Shohrukh', 'Eldor', 'Yusuf', 'Artem', 'Daniil', 'Kirill', 'Maksim', 'Nikita', 'Roman', 'Abror', 'Hurshid']
+const FEMALE = ['Aziza', 'Barno', 'Gulnora', 'Dilnoza', 'Zarina', 'Kamila', 'Lola', 'Malika', 'Nigora', 'Ozoda', 'Robiya', 'Sabina', 'Umida', 'Feruza', 'Shahlo', 'Yulduz', 'Anastasiya', 'Viktoriya', 'Darya', 'Ekaterina', 'Mariya', 'Sofiya', 'Sevara', 'Nilufar']
+const SURNAME = ['Abdullaev', 'Azimov', 'Bekmurodov', 'Valiev', 'Ganiev', 'Djuraev', 'Ergashev', 'Jumaev', 'Zokirov', 'Ibragimov', 'Karimov', 'Latipov', 'Mirzaev', 'Nazarov', 'Obidov', 'Pulatov', 'Rahimov', 'Saidov', 'Toshmatov', 'Umarov', 'Fayziev', 'Hakimov', 'Sharipov', 'Yusupov', 'Yakubov', 'Ivanov', 'Petrov', 'Smirnov', 'Kuznetsov', 'Sokolov']
 
 function person() {
   const female = chance(0.5)
   const first = female ? pick(FEMALE) : pick(MALE)
-  const last = pick(SURNAME) + (female ? 'а' : '')
+  const last = pick(SURNAME) + (female ? 'a' : '')
   return { name: last + ' ' + first, female }
 }
 
 const phone = () => '+998 ' + int(90, 99) + ' ' + int(100, 999) + '-' + int(10, 99) + '-' + int(10, 99)
 
-const TRANSLIT = { а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'j', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'c', ч: 'ch', ш: 'sh', щ: 'sh', ъ: '', ы: 'i', ь: '', э: 'e', ю: 'yu', я: 'ya' }
-const translit = (s) => s.toLowerCase().replace(/[а-яё]/g, (ch) => TRANSLIT[ch] ?? ch)
+/** Логин и почта строятся из имени: Ganieva Gulnora → gulnora.ganieva */
+const slug = (s) => s.toLowerCase().replace(/[^a-z]/g, '')
 
 // ─── Учителя ─────────────────────────────────────────────────
 const TEACHER_COURSES = [
@@ -134,13 +134,13 @@ function buildTeachers() {
       id: 'T' + String(i + 1).padStart(2, '0'),
       role: 'teacher',
       name: p.name,
-      login: translit(first) + '.' + translit(last),
+      login: slug(first) + '.' + slug(last),
       password: 'teacher',
       courseId,
       title: courseId === 'english' ? pick(['IELTS Trainer', 'Senior Teacher', 'Speaking Coach', 'Multilevel Expert']) : null,
       experience: int(2, 14),
       phone: phone(),
-      email: translit(first) + '.' + translit(last) + '@vibrant.uz',
+      email: slug(first) + '.' + slug(last) + '@vibrant.uz',
     }
   })
 }
@@ -208,12 +208,12 @@ function buildStudents(groups) {
       id,
       role: 'student',
       name: p.name,
-      login: translit(first) + '.' + translit(last),
+      login: slug(first) + '.' + slug(last),
       password: 'student',
       age,
       phone: phone(),
       parentPhone: age < 18 ? phone() : null,
-      email: translit(first) + '.' + translit(last) + '@mail.uz',
+      email: slug(first) + '.' + slug(last) + '@mail.uz',
       joinedAt: shift(TODAY, -int(20, 400)),
       note: '',
     })
@@ -368,8 +368,8 @@ function buildHomework(groups, enrollments) {
 
 // ─── Администраторы ──────────────────────────────────────────
 const ADMINS = [
-  { id: 'A01', role: 'admin', name: 'Исломов Исроил', login: 'admin', password: 'admin', title: 'Директор центра', phone: '+998 90 123-45-67' },
-  { id: 'A02', role: 'admin', name: 'Рахимова Севара', login: 'reception', password: 'admin', title: 'Администратор ресепшн', phone: '+998 93 555-11-22' },
+  { id: 'A01', role: 'admin', name: 'Islomov Isroil', login: 'admin', password: 'admin', title: 'Директор центра', phone: '+998 90 123-45-67' },
+  { id: 'A02', role: 'admin', name: 'Rahimova Sevara', login: 'reception', password: 'admin', title: 'Администратор ресепшн', phone: '+998 93 555-11-22' },
 ]
 
 export function buildDatabase() {

@@ -7,7 +7,7 @@ import {
   IconCourses,
   IconDate,
   IconHomework,
-  IconId,
+  IconLock,
   IconLogin,
   IconPause,
   IconPayments,
@@ -65,15 +65,16 @@ export default function StudentDetail({ studentId, role, onBack, backLabel }) {
             <div className="row wrap" style={{ gap: 10 }}>
               <h1 style={{ fontSize: 22 }}>{student.name}</h1>
               <Badge tone={meta.tone} dot lg>{meta.label}</Badge>
-              <Badge tone={profile.performance.tone}>{profile.performance.label}</Badge>
             </div>
             <div className="row wrap small muted" style={{ gap: 14, marginTop: 7 }}>
-              <span><IconId /> {student.id}</span>
               <span><IconAge /> {t('unit.years', { n: student.age })}</span>
               <span><IconPhone /> {student.phone}</span>
               {student.parentPhone && <span><IconParents /> {student.parentPhone}</span>}
               <span><IconDate /> {t('detail.joined', { date: fmtDate(student.joinedAt) })}</span>
               <span><IconLogin /> {t('detail.loginLabel', { login: student.login })}</span>
+              {role === 'admin' && (
+                <span><IconLock /> {t('detail.passwordLabel', { password: student.password })}</span>
+              )}
             </div>
             <div className="row wrap" style={{ gap: 7, marginTop: 12 }}>
               {courses.map((c) => (
@@ -117,7 +118,7 @@ export default function StudentDetail({ studentId, role, onBack, backLabel }) {
         </div>
       )}
 
-      <div className="grid g4">
+      <div className="grid g3">
         <Kpi label={t('admin.kpiAvg')} value={profile.avgScore ?? '—'} foot={t('common.ofGraded')} icon={IconStar} tone="warn" />
         <Kpi
           label={t('common.homework')}
@@ -132,13 +133,6 @@ export default function StudentDetail({ studentId, role, onBack, backLabel }) {
           foot={t('detail.kpiMissingFoot', { n: profile.hwPending })}
           icon={IconClock}
           tone={profile.hwMissing > 3 ? 'bad' : 'muted'}
-        />
-        <Kpi
-          label={t('detail.kpiCourses')}
-          value={courses.length}
-          foot={t('detail.kpiCoursesFoot', { n: courses.filter((c) => c.status === 'active').length })}
-          icon={IconCourses}
-          tone="brand"
         />
       </div>
 
@@ -189,7 +183,6 @@ export default function StudentDetail({ studentId, role, onBack, backLabel }) {
                     <Badge tone="warn"><IconStar /> {t('detail.avgBadge', { v: c.avgScore ?? '—' })}</Badge>
                     <Badge tone="info"><IconTarget /> {t('detail.attendanceBadge', { v: c.attendance })}</Badge>
                     {c.hwMissing > 0 && <Badge tone="bad">{t('detail.missingBadge', { n: c.hwMissing })}</Badge>}
-                    {c.hwPending > 0 && <Badge tone="muted">{t('detail.pendingBadge', { n: c.hwPending })}</Badge>}
                   </div>
                   <div className="divider" />
                   <div className="kv" style={{ padding: 0 }}>
@@ -301,7 +294,6 @@ export default function StudentDetail({ studentId, role, onBack, backLabel }) {
                   <th>{t('common.period')}</th>
                   <th>{t('common.method')}</th>
                   <th>{t('common.acceptedBy')}</th>
-                  <th>{t('common.comment')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -316,7 +308,6 @@ export default function StudentDetail({ studentId, role, onBack, backLabel }) {
                       <td className="small">{t('unit.months', { n: p.months })}</td>
                       <td className="small muted">{payMethod(p.method)}</td>
                       <td className="small muted">{admin?.name || '—'}</td>
-                      <td className="small muted">{p.comment || '—'}</td>
                     </tr>
                   )
                 })}
